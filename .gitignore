@@ -1,0 +1,17 @@
+# Fichiers Python inutiles
+__pycache__/
+*.pyc
+
+# Fichiers de configuration personnels
+*.env
+*.log
+
+# Dossiers virtuels
+.venv/
+venv/
+
+# Cache et fichiers temporaires
+*.sqlite3
+
+# Paramètres d'éditeur
+.vscode/
