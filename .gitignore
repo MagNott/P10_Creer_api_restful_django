@@ -15,3 +15,5 @@ venv/
 
 # Paramètres d'éditeur
 .vscode/
+
+db.sqlite3
