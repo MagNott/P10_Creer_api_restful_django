@@ -9,5 +9,6 @@ class CustomUserViewSet(ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
 
-    # A remettre lorsque j'aurai géré les JWT, je m'auto bloque pour les tests avec postman sinon
+    # A remettre lorsque j'aurai géré les JWT,
+    # je m'auto bloque pour les tests avec postman sinon
     # permission_classes = [IsAuthenticated]
