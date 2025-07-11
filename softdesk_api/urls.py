@@ -29,6 +29,7 @@ router.register(r"users", CustomUserViewSet, basename="user")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/projects/", include("project_core.urls")),
     path("api/", include(router.urls)),
 ]
 
