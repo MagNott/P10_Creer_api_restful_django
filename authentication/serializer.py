@@ -25,7 +25,10 @@ class CustomUserSerializer(ModelSerializer):
         age = today.year - input_date_birth.year
 
         # Vérifie si l'anniversaire est encore à venir cette année
-        if (today.month, today.day) < (input_date_birth.month, input_date_birth.day):  # noqa: E501
+        if (today.month, today.day) < (
+            input_date_birth.month,
+            input_date_birth.day,
+        ):  # noqa: E501
             age -= 1  # on enlève 1 à l'âge
 
         # On vérifie l'âge minimum
