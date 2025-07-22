@@ -1,8 +1,6 @@
-from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from .models import CustomUser
 from .serializer import CustomUserSerializer
-from rest_framework.permissions import IsAuthenticated
 
 
 class CustomUserViewSet(ModelViewSet):
