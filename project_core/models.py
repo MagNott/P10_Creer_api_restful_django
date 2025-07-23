@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+import uuid
 
 
 class Project(models.Model):
@@ -57,3 +58,88 @@ class Contributor(models.Model):
     # Django la gérerait automatiquement.
     class Meta:
         unique_together = ("user", "project")
+
+
+class Issue(models.Model):
+    """
+    Représente une issue (problème ou tâche) associée à un projet.
+
+    Champs :
+        - title (CharField) : titre court de l'issue.
+        - description (TextField) : détails plus longs sur l'issue.
+        - status (CharField, choices) : état actuel de l'issue (to_do, in_progress, finished).
+        - priority (CharField, choices) : niveau d'importance (low, medium, high).
+        - tag (CharField, choices) : type de l'issue (bug, feature, task).
+        - project (ForeignKey) : projet auquel est rattachée l'issue.
+        - author (ForeignKey) : utilisateur ayant créé l'issue.
+        - assignee (ForeignKey) : utilisateur assigné à l'issue.
+        - created_time (DateTimeField) : date de création, ajoutée automatiquement.
+    """
+    # Liste des statuts possibles pour une issue
+    TYPE_STATUS = [
+        ("to_do", "To DO"),
+        ("in_progress", "In Progress"),
+        ("finished", "Finished"),
+    ]
+
+    # Liste des priorités possibles pour une issue
+    TYPE_PRIORITY = [
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
+    ]
+
+    # Liste des tags possibles pour une issue
+    TYPE_TAG = [
+        ("bug", "Bug"),
+        ("feature", "Feature"),
+        ("task", "Task"),
+    ]
+
+    created_time = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="authored_issues",
+    )
+    assignee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="assigned_issues"
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="issues"
+    )
+    status = models.CharField(max_length=20, choices=TYPE_STATUS)
+    priority = models.CharField(max_length=20, choices=TYPE_PRIORITY)
+    tag = models.CharField(max_length=20, choices=TYPE_TAG)
+    title = models.CharField(max_length=50)
+    description = models.TextField()
+
+
+class Comment(models.Model):
+    """
+    Représente un commentaire ajouté à une issue.
+
+    Champs :
+        - uuid (UUIDField) : identifiant unique généré automatiquement.
+        - description (TextField) : contenu du commentaire.
+        - created_time (DateTimeField) : date de création automatique.
+        - author (ForeignKey) : utilisateur qui a écrit le commentaire.
+        - issue (ForeignKey) : issue associée au commentaire.
+    """
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_time = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="authored_issues",
+    )
+    issue = models.ForeignKey(
+        Issue,
+        on_delete=models.CASCADE,
+        related_name="comments"
+        )
+    description = models.TextField()
