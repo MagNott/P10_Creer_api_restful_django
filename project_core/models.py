@@ -67,13 +67,16 @@ class Issue(models.Model):
     Champs :
         - title (CharField) : titre court de l'issue.
         - description (TextField) : détails plus longs sur l'issue.
-        - status (CharField, choices) : état actuel de l'issue (to_do, in_progress, finished).
-        - priority (CharField, choices) : niveau d'importance (low, medium, high).
+        - status (CharField, choices) : état actuel de l'issue
+          (to_do, in_progress, finished).
+        - priority (CharField, choices) : niveau d'importance
+          (low, medium, high).
         - tag (CharField, choices) : type de l'issue (bug, feature, task).
         - project (ForeignKey) : projet auquel est rattachée l'issue.
         - author (ForeignKey) : utilisateur ayant créé l'issue.
         - assignee (ForeignKey) : utilisateur assigné à l'issue.
-        - created_time (DateTimeField) : date de création, ajoutée automatiquement.
+        - created_time (DateTimeField) : date de création,
+          ajoutée automatiquement.
     """
     # Liste des statuts possibles pour une issue
     TYPE_STATUS = [
@@ -124,22 +127,27 @@ class Comment(models.Model):
     Représente un commentaire ajouté à une issue.
 
     Champs :
-        - uuid (UUIDField) : identifiant unique généré automatiquement.
+        - uuid (UUIDField) : identifiant unique généré automatiquement qui est
+          paramétré comme étant la primary key.
         - description (TextField) : contenu du commentaire.
         - created_time (DateTimeField) : date de création automatique.
         - author (ForeignKey) : utilisateur qui a écrit le commentaire.
         - issue (ForeignKey) : issue associée au commentaire.
     """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        unique=True)
+    description = models.TextField()
     created_time = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="authored_issues",
+        related_name="authored_comments",
     )
     issue = models.ForeignKey(
         Issue,
         on_delete=models.CASCADE,
         related_name="comments"
         )
-    description = models.TextField()
