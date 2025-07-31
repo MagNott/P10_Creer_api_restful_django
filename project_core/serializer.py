@@ -1,4 +1,4 @@
-from .models import Project, Contributor, Issue
+from .models import Project, Contributor, Issue, Comment
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
@@ -66,3 +66,17 @@ class IssueSerializer(ModelSerializer):
             "project",
         ]
         read_only_fields = ["created_time", "author", "project"]
+
+
+class CommentSerializer(ModelSerializer):
+    """
+    Sérialise le modèle Comment.
+
+    - Inclut tous les champs du modèle
+    - Les champs 'uuid', 'author', 'issue' et 'created_time' sont en
+      lecture seule (définis automatiquement à la création)
+    """
+    class Meta:
+        model = Comment
+        fields = ["uuid", "description", "created_time", "author", "issue"]
+        read_only_fields = ["uuid", "created_time", "author", "issue"]
