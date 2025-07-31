@@ -1,4 +1,4 @@
-from .models import Project, Contributor
+from .models import Project, Contributor, Issue
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
@@ -41,3 +41,28 @@ class ContributorSerializer(ModelSerializer):
 
     def get_project_name(self, obj):
         return obj.project.name
+
+
+class IssueSerializer(ModelSerializer):
+    """
+    Sérialise le modèle Issue.
+
+    - Inclut tous les champs du modèle
+    - Les champs 'author', 'project' et 'created_time' sont en lecture seule
+      (définis automatiquement à la création)
+    """
+    class Meta:
+        model = Issue
+        fields = [
+            "id",
+            "title",
+            "description",
+            "status",
+            "priority",
+            "tag",
+            "created_time",
+            "author",
+            "assignee",
+            "project",
+        ]
+        read_only_fields = ["created_time", "author", "project"]

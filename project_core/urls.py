@@ -3,7 +3,8 @@ from .views.project_views import ProjectView
 from .views.project_views import ProjectDetailView
 from .views.contributor_views import ContributorView
 from .views.contributor_views import ContributorDetailView
-
+from .views.issue_views import IssueView
+from .views.issue_views import IssueDetailView
 
 urlpatterns = [
     path("", ProjectView.as_view(), name="project-list-create"),
@@ -19,5 +20,15 @@ urlpatterns = [
         "<int:project_id>/contributors/<int:contributor_id>/",
         ContributorDetailView.as_view(),
         name="project-contributor-detail",
+    ),
+    path(
+        "<int:project_id>/issues/",
+        IssueView.as_view(),
+        name="issue-list"
+    ),
+    path(
+        "<int:project_id>/issues/<int:issue_id>/",
+        IssueDetailView.as_view(),
+        name="issue-detail"
     ),
 ]
