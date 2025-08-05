@@ -7,40 +7,64 @@ from .views.issue_views import IssueView
 from .views.issue_views import IssueDetailView
 from .views.comment_views import CommentView
 from .views.comment_views import CommentDetailView
+from .views.choices_views import IssueChoicesView
+from .views.choices_views import ProjectChoicesView
 
 urlpatterns = [
-    path("", ProjectView.as_view(), name="project-list-create"),
-    path("<int:project_id>/",
-         ProjectDetailView.as_view(),
-         name="project-detail"),
+
+    # Routes projets
+    path("projects/", ProjectView.as_view(), name="project-list-create"),
     path(
-        "<int:project_id>/contributors/",
+        "projects/<int:project_id>/",
+        ProjectDetailView.as_view(),
+        name="project-detail"
+    ),
+
+    # Routes contributeurs
+    path(
+        "projects/<int:project_id>/contributors/",
         ContributorView.as_view(),
         name="project-contributors",
     ),
     path(
-        "<int:project_id>/contributors/<int:contributor_id>/",
+        "projects/<int:project_id>/contributors/<int:contributor_id>/",
         ContributorDetailView.as_view(),
         name="project-contributor-detail",
     ),
+
+    # Routes issues
     path(
-        "<int:project_id>/issues/",
+        "projects/<int:project_id>/issues/",
         IssueView.as_view(),
         name="issue-list"
     ),
     path(
-        "<int:project_id>/issues/<int:issue_id>/",
+        "projects/<int:project_id>/issues/<int:issue_id>/",
         IssueDetailView.as_view(),
         name="issue-detail"
     ),
+
+    # Routes commentaires
     path(
-        "<int:project_id>/issues/<int:issue_id>/comments/",
+        "projects/<int:project_id>/issues/<int:issue_id>/comments/",
         CommentView.as_view(),
         name="comment-list-create",
     ),
     path(
-        "<int:project_id>/issues/<int:issue_id>/comments/<uuid:comment_id>/",
+        "projects/<int:project_id>/issues/<int:issue_id>/comments/<uuid:comment_id>/",
         CommentDetailView.as_view(),
         name="comment-detail"
+    ),
+
+    # Routes choices globales
+    path(
+        'choices/issues/',
+        IssueChoicesView.as_view(),
+        name='issue-choices'
+    ),
+    path(
+        'choices/projects/',
+        ProjectChoicesView.as_view(),
+        name='project-choices'
     ),
 ]
