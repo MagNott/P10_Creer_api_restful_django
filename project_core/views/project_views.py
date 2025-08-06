@@ -1,9 +1,11 @@
+from project_core.permissions import IsAuthor
 from ..models import Project, Contributor
 from ..serializer import ProjectSerializer
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from ..permissions import IsContributor, IsAuthor
 
 
 class ProjectView(APIView):
@@ -80,6 +82,8 @@ class ProjectDetailView(APIView):
             l'utilisateur est l'auteur
     """
 
+    permission_classes = [IsContributor, IsAuthor]
+
     def get(self, request, project_id):
         """
         Récupère le détail d'un projet si l'utilisateur est contributeur
@@ -98,11 +102,12 @@ class ProjectDetailView(APIView):
                 - 404 Not Found si le projet n'existe pas
         """
         selected_project = get_object_or_404(Project, pk=project_id)
+        self.check_object_permissions(request, selected_project)
 
-        if not Contributor.objects.filter(
-            user=request.user, project=selected_project
-        ).exists():
-            return Response({"detail": "Accès interdit"}, status=403)
+        # if not Contributor.objects.filter(
+        #     user=request.user, project=selected_project
+        # ).exists():
+        #     return Response({"detail": "Accès interdit"}, status=403)
 
         serializer = ProjectSerializer(selected_project)
         return Response(serializer.data)
@@ -127,11 +132,15 @@ class ProjectDetailView(APIView):
                                   l'identifiant fourni
         """
         selected_project = get_object_or_404(Project, pk=project_id)
-        if selected_project.author == request.user:
-            selected_project.delete()
-            return Response(status=204)
-        else:
-            return Response({"detail": "Accès interdit"}, status=403)
+        # if selected_project.author == request.user:
+        #     selected_project.delete()
+        #     return Response(status=204)
+        # else:
+        #     return Response({"detail": "Accès interdit"}, status=403)
+
+        self.check_object_permissions(request, selected_project)
+        selected_project.delete()
+        return Response(status=204)
 
     def patch(self, request, project_id):
         """
@@ -152,15 +161,18 @@ class ProjectDetailView(APIView):
                                   fourni
         """
         selected_project = get_object_or_404(Project, pk=project_id)
-        if selected_project.author == request.user:
-            project_serializer = ProjectSerializer(
-                selected_project, data=request.data, partial=True
-            )
-            if project_serializer.is_valid():
-                project_serializer.save()
-                return Response(project_serializer.data, status=200)
-            else:
-                return Response(project_serializer.errors, status=400)
+        self.check_object_permissions(request, selected_project)
+
+        project_serializer = ProjectSerializer(
+            selected_project,
+            data=request.data,
+            partial=True
+        )
+        if project_serializer.is_valid():
+            project_serializer.save()
+            return Response(project_serializer.data, status=200)
+        else:
+            return Response(project_serializer.errors, status=400)
 
     def put(self, request, project_id):
         """
@@ -183,9 +195,7 @@ class ProjectDetailView(APIView):
                                   fourni
         """
         selected_project = get_object_or_404(Project, pk=project_id)
-
-        if selected_project.author != request.user:
-            return Response({"détail": "Accès interdit"}, status=403)
+        self.check_object_permissions(request, selected_project)
 
         project_serializer = ProjectSerializer(
             selected_project,
