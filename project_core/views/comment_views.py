@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from ..permissions import IsContributor, IsCommentAuthor
 
 
 class CommentView(APIView):
@@ -116,6 +117,9 @@ class CommentDetailView(APIView):
     - Tous les contributeurs peuvent consulter un commentaire.
     - Seul l'auteur du commentaire peut le modifier ou le supprimer.
     """
+
+    permission_classes = [IsContributor, IsCommentAuthor]
+
     def get(self, request: Request, project_id, issue_id, comment_id):
         """
         Récupère un commentaire spécifique si l'utilisateur est contributeur
@@ -149,6 +153,8 @@ class CommentDetailView(APIView):
             pk=comment_id,
             issue=selected_issue
         )
+
+        self.check_object_permissions(request, selected_comment)
 
         comment_serializer = CommentSerializer(selected_comment)
 
@@ -184,11 +190,13 @@ class CommentDetailView(APIView):
             issue=selected_issue
         )
 
-        if not selected_comment.author == request.user:
-            return Response({"detail": "Accès interdit"}, status=403)
-        else:
-            selected_comment.delete()
-            return Response(status=204)
+        self.check_object_permissions(request, selected_comment)
+
+        # if not selected_comment.author == request.user:
+        #     return Response({"detail": "Accès interdit"}, status=403)
+        # else:
+        selected_comment.delete()
+        return Response(status=204)
 
     def patch(self, request, project_id, issue_id, comment_id):
         """
@@ -224,19 +232,21 @@ class CommentDetailView(APIView):
             issue=selected_issue
         )
 
-        if not selected_comment.author == request.user:
-            return Response({"detail": "Accès interdit"}, status=403)
-        else:
-            comment_serializer = CommentSerializer(
-                selected_comment,
-                data=request.data,
-                partial=True
-            )
-            if comment_serializer.is_valid():
-                comment_serializer.save()
-                return Response(comment_serializer.data, status=200)
+        self.check_object_permissions(request, selected_comment)
 
-        return Response(comment_serializer.data, status=400)
+        # if not selected_comment.author == request.user:
+        #     return Response({"detail": "Accès interdit"}, status=403)
+        # else:
+        comment_serializer = CommentSerializer(
+            selected_comment,
+            data=request.data,
+            partial=True
+        )
+        if comment_serializer.is_valid():
+            comment_serializer.save()
+            return Response(comment_serializer.data, status=200)
+
+        return Response(comment_serializer.errors, status=400)
 
     def put(self, request, project_id, issue_id, comment_id):
         """
@@ -272,16 +282,17 @@ class CommentDetailView(APIView):
             pk=comment_id,
             issue=selected_issue
         )
+        self.check_object_permissions(request, selected_comment)
 
-        if not selected_comment.author == request.user:
-            return Response({"detail": "Accès interdit"}, status=403)
-        else:
-            comment_serializer = CommentSerializer(
-                selected_comment,
-                data=request.data,
-            )
-            if comment_serializer.is_valid():
-                comment_serializer.save()
-                return Response(comment_serializer.data, status=200)
+        # if not selected_comment.author == request.user:
+        #     return Response({"detail": "Accès interdit"}, status=403)
+        # else:
+        comment_serializer = CommentSerializer(
+            selected_comment,
+            data=request.data,
+        )
+        if comment_serializer.is_valid():
+            comment_serializer.save()
+            return Response(comment_serializer.data, status=200)
 
-        return Response(comment_serializer.data, status=400)
+        return Response(comment_serializer.errors, status=400)

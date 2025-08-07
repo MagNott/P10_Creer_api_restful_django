@@ -4,11 +4,14 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-
-
-# A remettre lorsque j'aurai géré les JWT,
-# je m'auto bloque pour les tests avec postman sinon
-# permission_classes = [IsAuthenticated]
+from rest_framework.permissions import AllowAny, IsAuthenticated
+# pour le token
+from rest_framework.permissions import AllowAny
+import rest_framework_simplejwt.views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 
 class CustomUserView(APIView):
@@ -18,6 +21,27 @@ class CustomUserView(APIView):
     - GET : retourne la liste de tous les utilisateurs
     - POST : crée un nouvel utilisateur
     """
+
+    def get_permissions(self):
+        """
+        Surcharge de la méthode get_permissions() de DRF
+        Retourne la liste des permissions à appliquer selon la méthode HTTP
+
+        - Si la requête est un POST :
+        Autorise tout le monde à accéder à la vue (AllowAny),
+        par exemple pour permettre la création d'un compte utilisateur
+        sans être déjà authentifié
+
+        - Pour toutes les autres méthodes (GET, PUT, PATCH, DELETE, etc.) :
+        Exige que l'utilisateur soit authentifié (IsAuthenticated),
+        ce qui bloque l'accès aux utilisateurs non connectés.
+
+        Returns:
+            list: Liste d'instances de classes de permission DRF
+        """
+        if self.request.method == "POST":
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get(self, request: Request) -> Response:
         """
@@ -39,7 +63,7 @@ class CustomUserView(APIView):
         """
         Crée un nouvel utilisateur CustomUser.
 
-        - 201 Created : si la création réussit, retourne l’utilisateur créé
+        - 201 Created : si la création réussit, retourne l'utilisateur créé
                         en JSON
         - 400 Bad Request : si les données sont invalides
         """
@@ -150,3 +174,15 @@ class CustomUserDetailView(APIView):
 
         selected_user.delete()
         return Response(status=204)
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    """Sous-classe pour rendre /api/token/ accessible sans authentification."""
+
+    permission_classes = [AllowAny]
+
+
+class MyTokenTokenRefreshView(TokenRefreshView):
+    """Sous-classe pour rendre /api/token/ accessible sans authentification."""
+
+    permission_classes = [AllowAny]
