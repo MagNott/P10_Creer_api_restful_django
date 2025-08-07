@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from ..permissions import IsContributor, IsIssueAuthor
 
 
 class IssueView(APIView):
@@ -97,6 +98,9 @@ class IssueDetailView(APIView):
             du projet.
     - (PUT/PATCH et DELETE seront ajoutés ensuite)
     """
+
+    permission_classes = [IsContributor, IsIssueAuthor]
+
     def get(self, request, project_id, issue_id):
         """
         Affiche les détails d'une issue spécifique si l'utilisateur est
@@ -115,16 +119,17 @@ class IssueDetailView(APIView):
         """
         selected_project = get_object_or_404(Project, pk=project_id)
 
-        if not Contributor.objects.filter(
-            user=request.user, project=selected_project
-        ).exists():
-            return Response({"detail": "Accès interdit"}, status=403)
+        # if not Contributor.objects.filter(
+        #     user=request.user, project=selected_project
+        # ).exists():
+        #     return Response({"detail": "Accès interdit"}, status=403)
 
         selected_issue = get_object_or_404(
             Issue,
             pk=issue_id,
             project=selected_project
         )
+        self.check_object_permissions(request, selected_issue)
 
         issue_serializer = IssueSerializer(selected_issue)
 
@@ -153,22 +158,23 @@ class IssueDetailView(APIView):
         """
         selected_project = get_object_or_404(Project, pk=project_id)
 
-        if not Contributor.objects.filter(
-            user=request.user, project=selected_project
-        ).exists():
-            return Response({"detail": "Accès interdit"}, status=403)
+        # if not Contributor.objects.filter(
+        #     user=request.user, project=selected_project
+        # ).exists():
+        #     return Response({"detail": "Accès interdit"}, status=403)
 
         selected_issue = get_object_or_404(
             Issue,
             pk=issue_id,
             project=selected_project
         )
+        self.check_object_permissions(request, selected_issue)
 
-        if not selected_issue.author == request.user:
-            return Response({"detail": "Accès interdit"}, status=403)
-        else:
-            selected_issue.delete()
-            return Response(status=204)
+        # if not selected_issue.author == request.user:
+        #     return Response({"detail": "Accès interdit"}, status=403)
+        # else:
+        selected_issue.delete()
+        return Response(status=204)
 
     def patch(self, request, project_id, issue_id):
         """
@@ -192,33 +198,34 @@ class IssueDetailView(APIView):
         """
         selected_project = get_object_or_404(Project, pk=project_id)
 
-        if not Contributor.objects.filter(
-            user=request.user, project=selected_project
-        ).exists():
-            return Response({"detail": "Accès interdit"}, status=403)
+        # if not Contributor.objects.filter(
+        #     user=request.user, project=selected_project
+        # ).exists():
+        #     return Response({"detail": "Accès interdit"}, status=403)
 
         selected_issue = get_object_or_404(
             Issue,
             pk=issue_id,
             project=selected_project
         )
+        self.check_object_permissions(request, selected_issue)
 
-        if not selected_issue.author == request.user:
-            return Response({"detail": "Accès interdit"}, status=403)
-        else:
-            issue_serializer = IssueSerializer(
-                selected_issue,
-                data=request.data,
-                partial=True
+        # if not selected_issue.author == request.user:
+        #     return Response({"detail": "Accès interdit"}, status=403)
+        # else:
+        issue_serializer = IssueSerializer(
+            selected_issue,
+            data=request.data,
+            partial=True
+        )
+        if issue_serializer.is_valid():
+            issue_serializer.save(
+                author=request.user,
+                project=selected_project
             )
-            if issue_serializer.is_valid():
-                issue_serializer.save(
-                    author=request.user,
-                    project=selected_project
-                )
-                return Response(issue_serializer.data, status=200)
+            return Response(issue_serializer.data, status=200)
 
-        return Response(issue_serializer.data, status=400)
+        return Response(issue_serializer.errors, status=400)
 
     def put(self, request, project_id, issue_id):
         """
@@ -242,29 +249,30 @@ class IssueDetailView(APIView):
         """
         selected_project = get_object_or_404(Project, pk=project_id)
 
-        if not Contributor.objects.filter(
-            user=request.user, project=selected_project
-        ).exists():
-            return Response({"detail": "Accès interdit"}, status=403)
+        # if not Contributor.objects.filter(
+        #     user=request.user, project=selected_project
+        # ).exists():
+        #     return Response({"detail": "Accès interdit"}, status=403)
 
         selected_issue = get_object_or_404(
             Issue,
             pk=issue_id,
             project=selected_project
         )
+        self.check_object_permissions(request, selected_issue)
 
-        if not selected_issue.author == request.user:
-            return Response({"detail": "Accès interdit"}, status=403)
-        else:
-            issue_serializer = IssueSerializer(
-                selected_issue,
-                data=request.data,
-            )
-            if issue_serializer.is_valid():
-                issue_serializer.save(
-                    author=request.user,
-                    project=selected_project
-            )
-                return Response(issue_serializer.data, status=200)
+        # if not selected_issue.author == request.user:
+        #     return Response({"detail": "Accès interdit"}, status=403)
+        # else:
+        issue_serializer = IssueSerializer(
+            selected_issue,
+            data=request.data,
+        )
+        if issue_serializer.is_valid():
+            issue_serializer.save(
+                author=request.user,
+                project=selected_project
+        )
+            return Response(issue_serializer.data, status=200)
 
-        return Response(issue_serializer.data, status=400)
+        return Response(issue_serializer.errors, status=400)

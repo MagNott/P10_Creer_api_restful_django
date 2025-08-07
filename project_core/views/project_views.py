@@ -1,11 +1,10 @@
-from project_core.permissions import IsAuthor
 from ..models import Project, Contributor
 from ..serializer import ProjectSerializer
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from ..permissions import IsContributor, IsAuthor
+from ..permissions import IsContributor, IsProjectAuthor
 
 
 class ProjectView(APIView):
@@ -82,7 +81,7 @@ class ProjectDetailView(APIView):
             l'utilisateur est l'auteur
     """
 
-    permission_classes = [IsContributor, IsAuthor]
+    permission_classes = [IsContributor, IsProjectAuthor]
 
     def get(self, request, project_id):
         """
