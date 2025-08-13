@@ -1,11 +1,10 @@
-from project_core.models import Issue, Comment
-from ..models import Project, Contributor, Issue, Comment
+from project_core.models import Project, Contributor, Issue, Comment
 from ..serializer import CommentSerializer
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from ..permissions import IsContributor, IsCommentAuthor
+from ..permissions import IsContributor, IsAuthor
 
 
 class CommentView(APIView):
@@ -118,7 +117,7 @@ class CommentDetailView(APIView):
     - Seul l'auteur du commentaire peut le modifier ou le supprimer.
     """
 
-    permission_classes = [IsContributor, IsCommentAuthor]
+    permission_classes = [IsContributor, IsAuthor]
 
     def get(self, request: Request, project_id, issue_id, comment_id):
         """

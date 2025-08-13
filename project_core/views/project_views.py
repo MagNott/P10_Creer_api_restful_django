@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from ..permissions import IsContributor, IsProjectAuthor
+from ..permissions import IsContributor, IsAuthor
 
 
 class ProjectView(APIView):
@@ -81,7 +81,7 @@ class ProjectDetailView(APIView):
             l'utilisateur est l'auteur
     """
 
-    permission_classes = [IsContributor, IsProjectAuthor]
+    permission_classes = [IsContributor, IsAuthor]
 
     def get(self, request, project_id):
         """

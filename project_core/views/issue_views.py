@@ -1,12 +1,11 @@
 from project_core.serializer import IssueSerializer
 from project_core.models import Issue
 from ..models import Project, Contributor
-from ..serializer import IssueSerializer
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from ..permissions import IsContributor, IsIssueAuthor
+from ..permissions import IsContributor, IsAuthor
 
 
 class IssueView(APIView):
@@ -99,7 +98,7 @@ class IssueDetailView(APIView):
     - (PUT/PATCH et DELETE seront ajoutés ensuite)
     """
 
-    permission_classes = [IsContributor, IsIssueAuthor]
+    permission_classes = [IsContributor, IsAuthor]
 
     def get(self, request, project_id, issue_id):
         """

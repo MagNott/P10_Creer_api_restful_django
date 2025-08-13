@@ -76,6 +76,8 @@ class CommentSerializer(ModelSerializer):
     - Les champs 'uuid', 'author', 'issue' et 'created_time' sont en
       lecture seule (définis automatiquement à la création)
     """
+    description = serializers.CharField(required=True, allow_blank=False)
+
     class Meta:
         model = Comment
         fields = ["uuid", "description", "created_time", "author", "issue"]
