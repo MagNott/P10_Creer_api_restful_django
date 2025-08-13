@@ -27,6 +27,10 @@ class IsContributor(BasePermission):
             True si l'utilisateur est contributeur du projet associé,
             False sinon.
         """
+        # Si pas d'utilisateur ou utilisateur non authentifié, on refuse direct
+        if not request.user or not request.user.is_authenticated:
+            return False
+
         # Si l'objet est un projet
         if isinstance(obj, Project):
             return Contributor.objects.filter(
@@ -52,7 +56,7 @@ class IsContributor(BasePermission):
         return False
 
 
-class IsProjectAuthor(BasePermission):
+class IsAuthor(BasePermission):
     """
     La permission permet de vérifier que l'utilisateur authentifié
     est bien auteur du projet concerné.
@@ -69,35 +73,35 @@ class IsProjectAuthor(BasePermission):
         return obj.author == request.user
 
 
-class IsIssueAuthor(BasePermission):
-    """
-    La permission permet de vérifier que l'utilisateur authentifié
-    est bien auteur de l'issue concerné.
-    """
+# class IsIssueAuthor(BasePermission):
+#     """
+#     La permission permet de vérifier que l'utilisateur authentifié
+#     est bien auteur de l'issue concerné.
+#     """
 
-    message = "Vous devez être auteur de cette issue pour réaliser cette action."
+#     message = "Vous devez être auteur de cette issue pour réaliser cette action."
 
-    def has_object_permission(self, request, view, obj):
-        """
-        Vérifie que l'utilisateur (request.user) est auteur
-        de l'issue correspondant (obj).
-        Retourne True si c'est le cas, False sinon.
-        """
-        return obj.author == request.user
+#     def has_object_permission(self, request, view, obj):
+#         """
+#         Vérifie que l'utilisateur (request.user) est auteur
+#         de l'issue correspondant (obj).
+#         Retourne True si c'est le cas, False sinon.
+#         """
+#         return obj.author == request.user
 
 
-class IsCommentAuthor(BasePermission):
-    """
-    La permission permet de vérifier que l'utilisateur authentifié
-    est bien auteur du commentaire concerné.
-    """
+# class IsCommentAuthor(BasePermission):
+#     """
+#     La permission permet de vérifier que l'utilisateur authentifié
+#     est bien auteur du commentaire concerné.
+#     """
 
-    message = "Vous devez être auteur de ce commentaire pour réaliser cette action."
+#     message = "Vous devez être auteur de ce commentaire pour réaliser cette action."
 
-    def has_object_permission(self, request, view, obj):
-        """
-        Vérifie que l'utilisateur (request.user) est auteur
-        du commentaire correspondant (obj).
-        Retourne True si c'est le cas, False sinon.
-        """
-        return obj.author == request.user
+#     def has_object_permission(self, request, view, obj):
+#         """
+#         Vérifie que l'utilisateur (request.user) est auteur
+#         du commentaire correspondant (obj).
+#         Retourne True si c'est le cas, False sinon.
+#         """
+#         return obj.author == request.user
