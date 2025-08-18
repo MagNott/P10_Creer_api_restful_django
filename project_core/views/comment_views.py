@@ -56,7 +56,7 @@ class CommentView(APIView, PageNumberPagination):
         ).exists():
             return Response({"detail": "Accès interdit"}, status=403)
 
-        comments = selected_issue.comments.all()
+        comments = selected_issue.comments.all().order_by("-created_time")
 
         paginated_issues = self.paginate_queryset(comments, request, view=self)
 

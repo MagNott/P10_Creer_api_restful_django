@@ -44,7 +44,7 @@ class IssueView(APIView, PageNumberPagination):
         ).exists():
             return Response({"detail": "Accès interdit"}, status=403)
 
-        issues = selected_project.issues.all()
+        issues = selected_project.issues.all().order_by("-created_time")
 
         paginated_issues = self.paginate_queryset(issues, request, view=self)
 

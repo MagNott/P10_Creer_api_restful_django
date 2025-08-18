@@ -44,7 +44,7 @@ class ContributorView(APIView, PageNumberPagination):
 
         contributors_project = Contributor.objects.filter(
             project=selected_project
-        )
+        ).order_by("-created_time")
 
         paginated_contributors = self.paginate_queryset(
             contributors_project,

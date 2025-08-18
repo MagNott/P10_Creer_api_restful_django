@@ -59,9 +59,9 @@ class ProjectView(APIView, PageNumberPagination):
               `ProjectSerializer`.
         """
 
-        projects_queryset = Project.objects.filter(
+        projects = Project.objects.filter(
             contributors__user=request.user
-        )
+        ).order_by("-created_time")
 
         # projects_contributor = Contributor.objects.filter(user=request.user)
 
@@ -70,7 +70,7 @@ class ProjectView(APIView, PageNumberPagination):
         #     projects.append(project_contributor.project)
 
         paginated_projects = self.paginate_queryset(
-            projects_queryset,
+            projects,
             request, view=self
         )
         serializer_project = ProjectSerializer(paginated_projects, many=True)
