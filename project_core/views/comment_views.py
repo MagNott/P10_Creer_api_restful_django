@@ -5,9 +5,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from ..permissions import IsContributor, IsAuthor
+from rest_framework.pagination import PageNumberPagination
 
 
-class CommentView(APIView):
+class CommentView(APIView, PageNumberPagination):
     """
     Gère les commentaires liés à une issue.
 
@@ -57,9 +58,11 @@ class CommentView(APIView):
 
         comments = selected_issue.comments.all()
 
-        comment_serializer = CommentSerializer(comments, many=True)
+        paginated_issues = self.paginate_queryset(comments, request, view=self)
 
-        return Response(comment_serializer.data, status=200)
+        comment_serializer = CommentSerializer(paginated_issues, many=True)
+
+        return self.get_paginated_response(comment_serializer.data)
 
     def post(self, request: Request, project_id, issue_id):
         """
