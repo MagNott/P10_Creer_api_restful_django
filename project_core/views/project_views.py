@@ -5,9 +5,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from ..permissions import IsContributor, IsAuthor
+from rest_framework.pagination import PageNumberPagination
 
 
-class ProjectView(APIView):
+class ProjectView(APIView, PageNumberPagination):
     """
     Gère la liste et l'ajout des projets sur l'URL : api/projects/
 
@@ -57,15 +58,24 @@ class ProjectView(APIView):
               Chaque projet contient les champs définis dans
               `ProjectSerializer`.
         """
-        projects_contributor = Contributor.objects.filter(user=request.user)
 
-        projects = []
-        for project_contributor in projects_contributor:
-            projects.append(project_contributor.project)
+        projects_queryset = Project.objects.filter(
+            contributors__user=request.user
+        )
 
-        serializer_project = ProjectSerializer(projects, many=True)
+        # projects_contributor = Contributor.objects.filter(user=request.user)
 
-        return Response(serializer_project.data, status=200)
+        # projects = []
+        # for project_contributor in projects_contributor:
+        #     projects.append(project_contributor.project)
+
+        paginated_projects = self.paginate_queryset(
+            projects_queryset,
+            request, view=self
+        )
+        serializer_project = ProjectSerializer(paginated_projects, many=True)
+
+        return self.get_paginated_response(serializer_project.data)
 
 
 class ProjectDetailView(APIView):

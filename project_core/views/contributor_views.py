@@ -5,9 +5,10 @@ from rest_framework.request import Request  # noqa: F401
 from rest_framework.response import Response
 from authentication.models import CustomUser as User
 from django.shortcuts import get_object_or_404
+from rest_framework.pagination import PageNumberPagination
 
 
-class ContributorView(APIView):
+class ContributorView(APIView, PageNumberPagination):
     """
     Gère la liste et l'ajout des contributeurs sur l'URL :
     api/projects/<id>/contributeurs
@@ -45,12 +46,18 @@ class ContributorView(APIView):
             project=selected_project
         )
 
-        serializer_project = ContributorSerializer(
+        paginated_contributors = self.paginate_queryset(
             contributors_project,
+            request,
+            view=self
+        )
+
+        serializer_project = ContributorSerializer(
+            paginated_contributors,
             many=True
         )
 
-        return Response(serializer_project.data, status=200)
+        return self.get_paginated_response(serializer_project.data)
 
     def post(self, request, project_id):
         """

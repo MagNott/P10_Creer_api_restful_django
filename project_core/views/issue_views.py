@@ -6,9 +6,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from ..permissions import IsContributor, IsAuthor
+from rest_framework.pagination import PageNumberPagination
 
 
-class IssueView(APIView):
+class IssueView(APIView, PageNumberPagination):
     """
     Gère la liste et l'ajout des issues sur les projets sur l'URL :
     api/projects/id/issues
@@ -45,9 +46,11 @@ class IssueView(APIView):
 
         issues = selected_project.issues.all()
 
-        issue_serializer = IssueSerializer(issues, many=True)
+        paginated_issues = self.paginate_queryset(issues, request, view=self)
 
-        return Response(issue_serializer.data, status=200)
+        issue_serializer = IssueSerializer(paginated_issues, many=True)
+
+        return self.get_paginated_response(issue_serializer.data)
 
     def post(self, request: Request, project_id) -> Response:
         """
