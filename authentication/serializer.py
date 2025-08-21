@@ -15,7 +15,12 @@ class CustomUserSerializer(ModelSerializer):
             "date_birth",
             "can_be_contacted",
             "can_data_be_shared",
+            "password",
         ]
+        extra_kwargs = {
+            'password': {'write_only': True}
+            # Pour ne pas renvoyer le mot de passe en réponse
+        }
 
     def validate_date_birth(self, input_date_birth: date):
 
@@ -38,3 +43,12 @@ class CustomUserSerializer(ModelSerializer):
             )
 
         return input_date_birth
+
+    def create(self, validated_data):
+
+        password = validated_data.pop('password')
+        user = CustomUser(**validated_data)
+        user.set_password(password)
+        user.save()
+
+        return user

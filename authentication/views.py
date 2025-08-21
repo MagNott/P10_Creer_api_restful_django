@@ -12,6 +12,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from authentication.permission import IsSelfOrAdmin
 
 
 class CustomUserView(APIView):
@@ -87,6 +88,8 @@ class CustomUserDetailView(APIView):
     - DELETE : supprime un utilisateur
     """
 
+    permission_classes = [IsSelfOrAdmin]
+
     def get(self, request, user_id):
         """
         Récupère un utilisateur CustomUser.
@@ -119,6 +122,7 @@ class CustomUserDetailView(APIView):
                           l'identifiant fourni
         """
         selected_user = get_object_or_404(CustomUser, pk=user_id)
+        self.check_object_permissions(request, selected_user)
         serializer_custom_user = CustomUserSerializer(
             selected_user, data=request.data, partial=True
         )
@@ -144,6 +148,7 @@ class CustomUserDetailView(APIView):
                           l'identifiant fourni
         """
         selected_user = get_object_or_404(CustomUser, pk=user_id)
+        self.check_object_permissions(request, selected_user)
         serializer_custom_user = CustomUserSerializer(
             selected_user,
             data=request.data
@@ -171,6 +176,7 @@ class CustomUserDetailView(APIView):
                                   l'identifiant fourni
         """
         selected_user = get_object_or_404(CustomUser, pk=user_id)
+        self.check_object_permissions(request, selected_user)
 
         selected_user.delete()
         return Response(status=204)
