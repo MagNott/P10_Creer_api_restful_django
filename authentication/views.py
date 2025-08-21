@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 # pour le token
 from rest_framework.permissions import AllowAny
-import rest_framework_simplejwt.views
+# import rest_framework_simplejwt.views
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,

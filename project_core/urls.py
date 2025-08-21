@@ -51,7 +51,7 @@ urlpatterns = [
         name="comment-list-create",
     ),
     path(
-        "projects/<int:project_id>/issues/<int:issue_id>/comments/<uuid:comment_id>/",
+        "projects/<int:project_id>/issues/<int:issue_id>/comments/<uuid:comment_id>/",  # noqa: E501
         CommentDetailView.as_view(),
         name="comment-detail"
     ),

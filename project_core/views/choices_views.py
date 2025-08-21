@@ -19,7 +19,8 @@ class IssueChoicesView (APIView):
 
         Retour :
             Un dictionnaire avec trois clés ("status", "priority", "tag"),
-            chacune contenant une liste de dictionnaires {"value": ..., "label": ...}.
+            chacune contenant une liste de dictionnaires
+            {"value": ..., "label": ...}.
         """
         status_list = []
 

@@ -63,12 +63,6 @@ class ProjectView(APIView, PageNumberPagination):
             contributors__user=request.user
         ).order_by("-created_time")
 
-        # projects_contributor = Contributor.objects.filter(user=request.user)
-
-        # projects = []
-        # for project_contributor in projects_contributor:
-        #     projects.append(project_contributor.project)
-
         paginated_projects = self.paginate_queryset(
             projects,
             request, view=self
@@ -113,11 +107,6 @@ class ProjectDetailView(APIView):
         selected_project = get_object_or_404(Project, pk=project_id)
         self.check_object_permissions(request, selected_project)
 
-        # if not Contributor.objects.filter(
-        #     user=request.user, project=selected_project
-        # ).exists():
-        #     return Response({"detail": "Accès interdit"}, status=403)
-
         serializer = ProjectSerializer(selected_project)
         return Response(serializer.data)
 
@@ -141,11 +130,6 @@ class ProjectDetailView(APIView):
                                   l'identifiant fourni
         """
         selected_project = get_object_or_404(Project, pk=project_id)
-        # if selected_project.author == request.user:
-        #     selected_project.delete()
-        #     return Response(status=204)
-        # else:
-        #     return Response({"detail": "Accès interdit"}, status=403)
 
         self.check_object_permissions(request, selected_project)
         selected_project.delete()

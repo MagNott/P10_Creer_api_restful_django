@@ -486,7 +486,9 @@ class TestCommentAPI(APITestCase):
         )
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Comment.objects.filter(uuid=self.comment.uuid).exists())
+        self.assertFalse(Comment.objects.filter(
+            uuid=self.comment.uuid).exists()
+        )
 
     def test_delete_comment_as_non_author(self):
         '''
@@ -524,4 +526,3 @@ class TestCommentAPI(APITestCase):
         )
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-

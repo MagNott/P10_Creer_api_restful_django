@@ -194,9 +194,6 @@ class CommentDetailView(APIView):
 
         self.check_object_permissions(request, selected_comment)
 
-        # if not selected_comment.author == request.user:
-        #     return Response({"detail": "Accès interdit"}, status=403)
-        # else:
         selected_comment.delete()
         return Response(status=204)
 
@@ -236,9 +233,6 @@ class CommentDetailView(APIView):
 
         self.check_object_permissions(request, selected_comment)
 
-        # if not selected_comment.author == request.user:
-        #     return Response({"detail": "Accès interdit"}, status=403)
-        # else:
         comment_serializer = CommentSerializer(
             selected_comment,
             data=request.data,
@@ -286,9 +280,6 @@ class CommentDetailView(APIView):
         )
         self.check_object_permissions(request, selected_comment)
 
-        # if not selected_comment.author == request.user:
-        #     return Response({"detail": "Accès interdit"}, status=403)
-        # else:
         comment_serializer = CommentSerializer(
             selected_comment,
             data=request.data,
