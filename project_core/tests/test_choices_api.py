@@ -37,7 +37,7 @@ class TestIssueProjectChoicesView(APITestCase):
         - Chaque liste doit contenir des dictionnaires avec les clés
           'value' et 'label'
         """
-        url = reverse("issue-choices") 
+        url = reverse("issue-choices")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

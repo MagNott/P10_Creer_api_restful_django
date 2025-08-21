@@ -44,7 +44,7 @@ class IssueView(APIView, PageNumberPagination):
         ).exists():
             return Response({"detail": "Accès interdit"}, status=403)
 
-        issues = selected_project.issues.all()
+        issues = selected_project.issues.all().order_by("-created_time")
 
         paginated_issues = self.paginate_queryset(issues, request, view=self)
 
@@ -68,7 +68,8 @@ class IssueView(APIView, PageNumberPagination):
         Returns:
             Response:
             - 201 Created avec les données de l'issue nouvellement créée.
-            - 400 si les données envoyées ne sont pas valides.
+            - 400 si les données envoyées ne sont pas valides ou
+                  l'assignée n'est pas contributeur.
             - 403 si l'utilisateur n'est pas contributeur du projet.
         """
         selected_project = get_object_or_404(Project, pk=project_id)
@@ -77,14 +78,28 @@ class IssueView(APIView, PageNumberPagination):
             project=selected_project,
             user=request.user
         ).exists():
-            return Response({"detail": "Accès interdit"}, status=403)
+            return Response({"detail": "Vous devez être contributeur pour créer une issue"}, status=403)  # noqa: E501
+
+        user_assignee_id = request.data.get('assignee')
+        assignee_contributor = None
+        if user_assignee_id:
+            # valider que user_assignee_id correspond bien à un contributeur
+            assignee_contributor = Contributor.objects.filter(
+                user__id=user_assignee_id,
+                project=selected_project
+            ).first()
+            if not assignee_contributor:
+                return Response(
+                    {"detail": "L'utilisateur assigné n'est pas contributeur de ce projet"},  # noqa: E501
+                    status=400)
 
         issue_serializer = IssueSerializer(data=request.data)
 
         if issue_serializer.is_valid():
             issue_serializer.save(
                 project=selected_project,
-                author=request.user
+                author=request.user,
+                assignee=assignee_contributor.user if assignee_contributor else None,  # noqa: E501
             )
             return Response(issue_serializer.data, status=201)
         else:
@@ -121,11 +136,6 @@ class IssueDetailView(APIView):
         """
         selected_project = get_object_or_404(Project, pk=project_id)
 
-        # if not Contributor.objects.filter(
-        #     user=request.user, project=selected_project
-        # ).exists():
-        #     return Response({"detail": "Accès interdit"}, status=403)
-
         selected_issue = get_object_or_404(
             Issue,
             pk=issue_id,
@@ -160,11 +170,6 @@ class IssueDetailView(APIView):
         """
         selected_project = get_object_or_404(Project, pk=project_id)
 
-        # if not Contributor.objects.filter(
-        #     user=request.user, project=selected_project
-        # ).exists():
-        #     return Response({"detail": "Accès interdit"}, status=403)
-
         selected_issue = get_object_or_404(
             Issue,
             pk=issue_id,
@@ -172,9 +177,6 @@ class IssueDetailView(APIView):
         )
         self.check_object_permissions(request, selected_issue)
 
-        # if not selected_issue.author == request.user:
-        #     return Response({"detail": "Accès interdit"}, status=403)
-        # else:
         selected_issue.delete()
         return Response(status=204)
 
@@ -200,11 +202,6 @@ class IssueDetailView(APIView):
         """
         selected_project = get_object_or_404(Project, pk=project_id)
 
-        # if not Contributor.objects.filter(
-        #     user=request.user, project=selected_project
-        # ).exists():
-        #     return Response({"detail": "Accès interdit"}, status=403)
-
         selected_issue = get_object_or_404(
             Issue,
             pk=issue_id,
@@ -212,9 +209,6 @@ class IssueDetailView(APIView):
         )
         self.check_object_permissions(request, selected_issue)
 
-        # if not selected_issue.author == request.user:
-        #     return Response({"detail": "Accès interdit"}, status=403)
-        # else:
         issue_serializer = IssueSerializer(
             selected_issue,
             data=request.data,
@@ -251,11 +245,6 @@ class IssueDetailView(APIView):
         """
         selected_project = get_object_or_404(Project, pk=project_id)
 
-        # if not Contributor.objects.filter(
-        #     user=request.user, project=selected_project
-        # ).exists():
-        #     return Response({"detail": "Accès interdit"}, status=403)
-
         selected_issue = get_object_or_404(
             Issue,
             pk=issue_id,
@@ -263,9 +252,6 @@ class IssueDetailView(APIView):
         )
         self.check_object_permissions(request, selected_issue)
 
-        # if not selected_issue.author == request.user:
-        #     return Response({"detail": "Accès interdit"}, status=403)
-        # else:
         issue_serializer = IssueSerializer(
             selected_issue,
             data=request.data,
@@ -273,8 +259,7 @@ class IssueDetailView(APIView):
         if issue_serializer.is_valid():
             issue_serializer.save(
                 author=request.user,
-                project=selected_project
-        )
+                project=selected_project)
             return Response(issue_serializer.data, status=200)
 
         return Response(issue_serializer.errors, status=400)

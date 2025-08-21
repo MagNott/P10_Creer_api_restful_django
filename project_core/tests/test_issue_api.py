@@ -68,7 +68,7 @@ class TestIssueAPI(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        titles = [issue["title"] for issue in response.json()]
+        titles = [issue["title"] for issue in response.json()["results"]]
         self.assertIn(self.issue.title, titles)
 
     def test_list_issues_as_anonymous_user(self):

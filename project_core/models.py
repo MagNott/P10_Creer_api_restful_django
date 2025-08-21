@@ -108,7 +108,9 @@ class Issue(models.Model):
     assignee = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="assigned_issues"
+        related_name="assigned_issues",
+        null=True,
+        blank=True,
     )
     project = models.ForeignKey(
         Project,

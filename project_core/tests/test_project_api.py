@@ -62,8 +62,7 @@ class TestProjectAPI(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # Optionnel : vérifier que le projet est bien dans la réponse
-        titles = [project["name"] for project in response.json()]
+        titles = [project["name"] for project in response.json()["results"]]
         self.assertIn(self.project.name, titles)
 
     def test_list_projects_as_anonymous_user(self):
