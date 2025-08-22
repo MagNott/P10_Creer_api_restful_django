@@ -126,7 +126,7 @@ L’API prend en charge les opérations suivantes sur les ressources :
 - Lister toutes les issues d’un projet (si l’utilisateur est contributeur) avec une pagination.
 - Créer une nouvelle issue dans un projet.
 - Modifier ou supprimer une issue (réservé à l’auteur de l’issue).
-- Attribuer une issue à un contributeur du projet. A VERIFIER
+- Attribuer une issue à un contributeur du projet.
 
 ### Commentaires
 - `GET /api/projects/{id}/issues/{id}/comments/` : liste paginée des commentaires
@@ -181,8 +181,18 @@ L’auth se fait via force_authenticate (pas de logout serveur, JWT géré côt�
 ## Comptes de test
 Une base de données peuplée avec des données de test est intégrée afin de manipuler l'API.
 
+L'admin est :
+Magali - Mdp : motpasseadmin1
+
 Les utilisateurs sont :
-Détailler les utilisateurs
+- Magali
+- MagNott
+- Claire
+- Lucas
+- Sophie
+- Bernard
+Ils ont tous le même mot de passe : motpasse456
+
 
 
 ## Auteur

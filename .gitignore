@@ -10,10 +10,5 @@ __pycache__/
 .venv/
 venv/
 
-# Cache et fichiers temporaires
-*.sqlite3
-
 # Paramètres d'éditeur
 .vscode/
-
-db.sqlite3
