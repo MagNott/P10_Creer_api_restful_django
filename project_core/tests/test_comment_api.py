@@ -110,7 +110,7 @@ class TestCommentAPI(APITestCase):
         des commentaires
 
         - Déconnecte l'utilisateur (force_authenticate None)
-        - Envoie une requête GET sur 
+        - Envoie une requête GET sur
           /api/projects/<project_id>/issues/<issue_id>/comments/
         - Vérifie que le code HTTP est 401 Unauthorized
         """
